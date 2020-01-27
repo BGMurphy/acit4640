@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-# SUbmitted by Group 8: Benjamin Murphy (A00805865), Nao Hashizume (A01022269) 
+# Submitted by Group 8: Benjamin Murphy (A00805865), Nao Hashizume (A01022269) 
 
 SETUP_FILEPATH="setup"
 TODOAPP_USER="todoapp"
