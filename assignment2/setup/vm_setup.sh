@@ -4,7 +4,7 @@
 
 SETUP_FILEPATH="setup"
 TODOAPP_USER="todoapp"
-HTTP_PORT="8080"
+HTTP_PORT="80"
 SYSTEMD_FILE_PATH="/etc/systemd/system"
 TODOAPP_CONFIG_DIR_PATH="/home/todoapp/app/config"
 DATABASE_FILE_PATH="$SETUP_FILEPATH/database.js"
@@ -12,14 +12,14 @@ NGINX_FILE_PATH="$SETUP_FILEPATH/nginx.conf"
 TODOAPP_SERVICE_PATH="$SETUP_FILEPATH/todoapp.service"
 
 # Copy all files in setup to VM
-scp -r "$SETUP_FILEPATH" todoapp:~
+scp -r "$SETUP_FILEPATH/setup" lab1vm:~
 
-ssh todoapp << EOF
+ssh lab1vm << EOF
 
     # Add todoapp user 
     add_user(){
         echo "Creating todoapp user..."
-        sudo useradd -p $(openssl passwd -1 P@ssw0rd) "$TODOAPP_USER"
+        sudo useradd -p P@ssw0rd "$TODOAPP_USER"
         echo "Completed creating todoapp user!!!"
     }
 
@@ -45,8 +45,7 @@ ssh todoapp << EOF
     # Setup Todo App
     setup_todoapp(){
         echo "Configuring Todo app..."
-
-        echo "Setting up web app..."
+	sudo chmod 755 /home/todoapp
         git clone https://github.com/timoguic/ACIT4640-todo-app.git app
         cd app
         npm install -q
@@ -54,8 +53,9 @@ ssh todoapp << EOF
 	sudo mv app /home/todoapp
         sudo chown todoapp /home/todoapp/app
         cd
+	pwd
         sudo cp -f "$DATABASE_FILE_PATH" "$TODOAPP_CONFIG_DIR_PATH"
-        sudo cp -f "$NGINX_FILE_PATH" "$TODOAPP_CONFIG_DIR_PATH"
+        sudo cp -f "$NGINX_FILE_PATH" "/etc/nginx/nginx.conf"
         sudo cp -f "$TODOAPP_SERVICE_PATH" "$SYSTEMD_FILE_PATH"
 
         echo "Setting up program..."
@@ -64,6 +64,8 @@ ssh todoapp << EOF
         sudo systemctl daemon-reload
         sudo systemctl enable todoapp
         sudo systemctl start todoapp
+	sudo sed -i '/SELINUX=enforcing/c\SELINUX=permissive' /etc/selinux/config
+	sudo shutdown -hr now
     }
 
 add_user
