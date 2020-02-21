@@ -1,0 +1,15 @@
+[Unit]
+Description=hichat app, ACIT4640
+After=network.target
+
+[Service]
+Environment=NODE_PORT=3000
+WorkingDirectory=/app
+Type=simple
+User=hichat
+ExecStart=/usr/bin/node /app/server.js
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
